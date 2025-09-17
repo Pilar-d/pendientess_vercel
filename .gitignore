@@ -10,3 +10,4 @@ ENV/
 *.db
 instance/
 .DS_Store
+.vercel
