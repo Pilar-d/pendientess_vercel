@@ -9,10 +9,10 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "app.py",
-      "headers": {
-        "Content-Type": "text/html"
-      }
+      "dest": "app.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHON_VERSION": "3.9"
+  }
 }
