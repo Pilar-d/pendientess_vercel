@@ -1,8 +1,25 @@
-from app import app  # Importa tu aplicación Flask
-from vercel.request import Request
-from vercel.response import Response
+from app import app
 
-def handler(request: Request, response: Response):
-    # Esta función actuará como wrapper para tu app Flask
+def handler(request, response):
+    # Simular entorno WSGI para Vercel
+    environ = {
+        'REQUEST_METHOD': request.method,
+        'PATH_INFO': request.path,
+        'QUERY_STRING': request.query_string,
+        'SERVER_NAME': 'vercel',
+        'SERVER_PORT': '80',
+        'wsgi.version': (1, 0),
+        'wsgi.url_scheme': 'http',
+        'wsgi.input': None,
+        'wsgi.errors': None,
+        'wsgi.multithread': False,
+        'wsgi.multiprocess': False,
+        'wsgi.run_once': False
+    }
+    
+    # Ejecutar la aplicación Flask
+    result = app(environ, lambda status, headers: None)
+    
+    # Configurar respuesta
     response.status = 200
-    response.send("Aplicación funcionando en Vercel")
+    response.send(b''.join(result))
