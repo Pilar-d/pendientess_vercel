@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h2>Mis Tareas</h2>
+    
+    <form method="POST" action="{{ url_for('crear') }}" class="task-form">
+        <h3>Nueva Tarea</h3>
+        <input type="text" name="titulo" placeholder="Título" required>
+        <textarea name="descripcion" placeholder="Descripción"></textarea>
+        <input type="date" name="fecha_limite" required>
+        <select name="categoria">
+            <option value="laboral">Laboral</option>
+            <option value="personal">Personal</option>
+            <option value="estudio">Estudio</option>
+        </select>
+        <button type="submit">Crear Tarea</button>
+    </form>
+</div>
+
+<div class="filters">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Buscar..." value="{{ q }}">
+        <select name="orden" onchange="this.form.submit()">
+            <option value="recientes" {% if orden == 'recientes' %}selected{% endif %}>Más recientes</option>
+            <option value="antiguas" {% if orden == 'antiguas' %}selected{% endif %}>Más antiguas</option>
+            <option value="titulo" {% if orden == 'titulo' %}selected{% endif %}>Por título</option>
+        </select>
+        <button type="submit">Buscar</button>
+    </form>
+</div>
+
+<div class="tasks">
+    {% for tarea in tareas %}
+        <div class="task {% if tarea.completada %}completed{% endif %} {% if tarea.fecha_limite and tarea.fecha_limite < hoy %}overdue{% endif %}">
+            <div class="task-header">
+                <h3>{{ tarea.titulo }}</h3>
+                <span class="category {{ tarea.categoria }}">{{ tarea.categoria }}</span>
+            </div>
+            
+            <p>{{ tarea.descripcion }}</p>
+            
+            <div class="task-meta">
+                <span class="date">
+                    📅 {{ tarea.fecha_limite.strftime('%d/%m/%Y') if tarea.fecha_limite else 'Sin fecha' }}
+                    {% if tarea.fecha_limite and tarea.fecha_limite < hoy %}⚠️ Atrasada{% endif %}
+                </span>
+                
+                <div class="task-actions">
+                    <form method="POST" action="{{ url_for('toggle', tarea_id=tarea.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-toggle">
+                            {{ '✅' if tarea.completada else '⬜' }}
+                        </button>
+                    </form>
+                    
+                    <a href="{{ url_for('editar', tarea_id=tarea.id) }}" class="btn-edit">✏️</a>
+                    
+                    <form method="POST" action="{{ url_for('eliminar', tarea_id=tarea.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('¿Eliminar esta tarea?')">🗑️</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="no-tasks">No hay tareas. ¡Crea una nueva!</p>
+    {% endfor %}
+</div>
+{% endblock %}
